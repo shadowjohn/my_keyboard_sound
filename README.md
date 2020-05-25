@@ -18,7 +18,7 @@
   <img src="screenshot/my_keyboard_sound_1.png">
 </center>
 <br>
-之後打字就會有機械鍵盤聲
+之後打字就會有機械鍵盤聲，叮叮噹噹很爽快~
 <br>
 <br>
 Todo:<br>
