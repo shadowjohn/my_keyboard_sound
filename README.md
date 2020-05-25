@@ -7,7 +7,7 @@
 
 <h2>使用方法</h2>
 下載 dist 目錄下所有檔案 或
-  <a href="https://github.com/shadowjohn/my_keyboard_sound/blob/master/dist/my_keyboard_sound.zip>my_keyboard_sound.zip</a>
+  <a href="https://github.com/shadowjohn/my_keyboard_sound/blob/master/dist/my_keyboard_sound.zip">my_keyboard_sound.zip</a>
 <br>
 <br>
 解壓縮後執行 my_keyboard_sound.exe <br>
