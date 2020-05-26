@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
-VERSION=0.02
+VERSION=0.03
 import portalocker
 import os
 import sys
-import gtk
-from gtk import gdk 
-import pythoncom, pyHook
+import pkg_resources
+import tkinter
+from tkinter import messagebox
+from traybar import SysTrayIcon
+import threading
+import uuid
+import pythoncom 
+import pyHook
 import thread
 import base64
 import php
@@ -16,27 +21,26 @@ import pyaudio
 import audioop
 import wave
 paudio_player = pyaudio.PyAudio()
-
+is_stop_thread = False
 my = php.kit()
+PWD = os.path.dirname(os.path.realpath(sys.argv[0]))
 reload(sys)
 sys.setdefaultencoding('UTF-8')
 
-UCL_PIC_BASE64 = "AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAAMIOAADCDgAAAAAAAAAAAAD////////////////////////////////////////////////////////////////////////////////////////////////+/v7//Pz8//v7+//7+/v//f39////////////////////////////////////////////////////////////1s7B/1pVU/9PT0//Tk5Q/56rtP/Cua7/bGlp/2pqa/9tbGz/ampp/25xd//R2eL//////////////////////8O1of8kIyn/fYCD/0A0Lf9vgZD/kIJv/yUrMv9WUEr/FBcd/19eXv8fHR//q7zL///////////////////////CtKH/MDE4/6qwt/9zZFf/boCP/49/bf9VZXf/v7Ok/y0zP//T09P/QDcw/6q7yv//////////////////////w7Wj/yEcGv8pKy//OTUy/3GCkf+Pf23/VWV3/7+zo/8sMz//09PS/0A3MP+qu8r//////////////////////8KzoP84O0H/b2to/y4pJf9wgpH/j4Bt/1BfcP+1qpv/KjA7/8fHx/89NC//qrvK///////////////////////Cs6D/O0FM/9HS0f9IOi//boGQ/5KCcP8UFhn/Ly0p/w0PEv80MzP/FRcc/62+zP//////////////////////wrOh/zI1Ov9hXFT/AwAB/3GDk/+QgW//NkBK/6iqrP+trKz/qqqq/62vs//l6u///////////////////////76vnf8aFhb/Mzs+/0M9OP9wgpD/j39t/1Fhc//7//////////////////////////////////////////////+vnYv/QUtX/9ff3/96alv/bX+P/49/bf9RYHL/+/7/////////////v7Ko/5ifqf/7/v//////////////////inhn/19vgf//////fGpa/21/jv+Of23/UWBy//v+/////////////4Z0Yv9KWmv/+f3/////////////+/bv/1pNQv+Kmaf/samg/z01L/93iZn/n5B+/ygrMf93eXr/fHx8/3p4dv8vKib/eIqc//////////////////37+P/Mycf/5+rt/9HMxv+zs7X/3uPo/+zo4/+4trT/srKy/7Kysv+ysrL/tba5/+Tp7v//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
-PWD = os.path.dirname(os.path.realpath(sys.argv[0]))
+# hide root window
+root = tkinter.Tk()
+root.withdraw()
+
+# 系統圖示                                                    
+UCL_PIC_BASE64 = "AAABAAEAOT0AAAEAIABkOAAAFgAAACgAAAA5AAAAegAAAAEAIAAAAAAAVDYAAMMOAADDDgAAAAAAAAAAAAD////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////U/4BVgP/U////////////////////////////1P+qgFX/VVVV/1VVVf9VVVX/gICq/9TU/////////////////////////////////////////////////////////9TU/9TU1P/U1Kr/qqqq/6qqqv+qqqr/qqqq/6qqqv+qqqr/qqqq/6qqqv+qqqr/qqqq/6qqqv+q1NT/1NTU////////////////////////////////////////////////////////////////////////////////////////1Kr/VSsA/0yxIv9Vqv////////////////////////+qVf9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv8rVar////////////////////////////////////U/4BVK/9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv8rVar/1P/////////////////////////////////////////////////////////////////////UgP8rAAD/TLEi/0yxIv8AVar//////////////////////6pVAP9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/Var//////////////////////////6r/VQAA/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/ACuA/9T//////////////////////////////////////////////////////////////6pVAP9MsSL/TLEi/0yxIv8AAFX/qv////////////////+q/1UAAP9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/ACuA/9T////////////////////UgCv/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/1Wq//////////////////////////////////////////////////////////////+qVf9MsSL/TLEi/0yxIv9MsSL/Var/////////////1IAr/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/AABV/6r/////////////////1P+AKwD/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/wArgP/U////////////////////////////////////////////////////////////qv9VAAD/TLEi/0yxIv9MsSL/K4DU///////////////////////////////////////UgCv/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/AAAr/4Cqqv/U1NT/1NTU/9TU1P/U1NT/1NTU/9TU1P/U1NT/1NTU/9TU1P/U1NT/1NTU/9TU1P+qgFX/TLEi/0yxIv9MsSL/TLEi/wAAVf+q//////////////////////////////////////////////////////////////+qVQD/TLEi/0yxIv9MsSL/ACuA/9T/////////////////////////////////////qlX/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/K4DU////////////////////////////////////////////////////////////////////////////qlUA/0yxIv9MsSL/TLEi/wAAK/+A1P//////////////////////////////////////////////////////////////qlX/TLEi/0yxIv9MsSL/AABV/6r/////////////////////////////////////qlX/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/K4DU/////////////////////////////////////////////////////////////////////////////6pV/0yxIv9MsSL/TLEi/0yxIv8rgNT/////////////////////////////////////////////////////////////1ID/KwAA/0yxIv9MsSL/AAAr/4DU////////////////////////////////////qlX/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/K4DU/////////////////////////////////////////////////////////////////////////////9SA/ysAAP9MsSL/TLEi/0yxIv8rgNT//////////////////////////////////////////////////////////////6r/VQAA/0yxIv9MsSL/TLEi/1Wq////////////////////////////////////qlX/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/K4DU//////////////////////////////////////////////////////////////////////////////+q/1UAAP9MsSL/TLEi/0yxIv8AVar/////////////////////////////////////////////////////////////////qlUA/0yxIv9MsSL/TLEi/yuA1P//////////////////////////////////qlX/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/K4DU///////////////////////////////////////////////////////////////////////////////U/4ArAP9MsSL/TLEi/0yxIv8AK4D/1P//////////////////////////////////////////////////////////////1IAr/0yxIv9MsSL/TLEi/wBVqv//////////////////////////////////qlX/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/K4DU///////////////////////////////////////////////////////////////////////////////U/4ArAP9MsSL/TLEi/0yxIv8AAFX/qv//////////////////////////////////////////////////////////////1IAr/0yxIv9MsSL/TLEi/wArgP/U////////////////////////////////qlX/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/K4DU/////////////////////////////////////////////////////////////////////////////////6pVAP9MsSL/TLEi/0yxIv8rVar/1P///////////////////////////////////////////////////////////////6pV/0yxIv9MsSL/TLEi/wArgP/U///////U/9T/////////////////////qlX/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/K4DU/////////////////////////////////////////////////////////////////////////////////6pVAP8rK1X/gKrU/////////////////////////////////////////////////////////////////////////////9SA/ysAAP9MsSL/TLEi/wAAVf+q////qlUA/wArgP/U////////////////qlX/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/K4DU/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////9SA/ysAAP9MsSL/TLEi/wAAVf+q1ID/KwAA/0yxIv8AVar/1P//////////qlX/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/K4DU/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////9SA/ysAAP9MsSL/TLEi/wAAVf9VVQD/TLEi/0yxIv9MsSL/AFWq////////qlX/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/K4DU/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////9SA/ysAAP9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/yuA1P//qlX/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/K4DU//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////+q/1UAAP9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9VVVX/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/K4DU//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////+q/1UAAP9MsSL/TLEi/0yxIv9VqtT/gCsA/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/K4DU//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////+q/1UAAP9MsSL/TLEi/0yxIv9Vqv////+q/1UrAP9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/K4DU//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////+q/1UAAP9MsSL/TLEi/0yxIv9Vqv//////////qv9VAAD/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/K4Cq/9TU1P/U1NT/1NTU/9TU1P/U1NT/1NTU/9TU1P/U1NT/1NTU/9TU1P/U1NT/1NTU/9TU1P/U1NT/1NTU/9TU1P/U1NT/1NT///////////////////////////////////////////////////////////////////////////////+q/1UAAP9MsSL/TLEi/0yxIv9Vqv//////////////1ID/KwAA/0yxIv9MsSL/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/ACuA/9T///////////////////////////////////////////////////////////////////////////+q/1UAAP9MsSL/TLEi/0yxIv9Vqv///////////////////6pV/0yxIv9MsSL/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/ACuA/9T///////////////////////////////////////////////////////////////////////////+q/1UAAP9MsSL/TLEi/0yxIv9Vqv///////////////////////9SAK/9MsSL/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/ACuA/9T///////////////////////////////////////////////////////////////////////////+q/1UAAP9MsSL/TLEi/0yxIv9Vqv//////////////////////////1P+AKwD/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/ACuA/9T///////////////////////////////////////////////////////////////////////////+q/1UAAP9MsSL/TLEi/0yxIv9Vqv//////////////////////////////qlX/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/K1WA/6qqqv+qqqr/qqqq/6qqgP8rAAD/TLEi/0yxIv9MsSL/ACuA/6qqqv+qqqr/qqqq/6qqqv+AKwD/TLEi/0yxIv9MsSL/ACuA/9T///////////////////////////////////////////////////////////////////////////+q/1UAAP9MsSL/TLEi/0yxIv9Vqv/////////UgP8rACv/VarU////////qlX/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/K4DU////////////////////qv9VAAD/TLEi/0yxIv9MsSL/AFWq//////////////////////+qVQD/TLEi/0yxIv9MsSL/ACuA/9T///////////////////////////////////////////////////////////////////////////+q/1UAAP9MsSL/TLEi/0yxIv9Vqv///////9SAK/9MsSL/TLEi/ytVgP/UqlX/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/K4DU////////////////////qv9VAAD/TLEi/0yxIv9MsSL/AFWq//////////////////////+qVQD/TLEi/0yxIv9MsSL/ACuA/9T///////////////////////////////////////////////////////////////////////////+q/1UAAP9MsSL/TLEi/0yxIv9Vqv/////U/4ArAP9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/K4DU////////////////////qv9VAAD/TLEi/0yxIv9MsSL/AFWq//////////////////////+qVQD/TLEi/0yxIv9MsSL/ACuA/9T///////////////////////////////////////////////////////////////////////////+q/1UAAP9MsSL/TLEi/0yxIv9Vqv///9SA/ysAAP9MsSL/TLEi/0yxIv9VVVX/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/K4DU////////////////////qv9VAAD/TLEi/0yxIv9MsSL/AFWq//////////////////////+qVQD/TLEi/0yxIv9MsSL/ACuA/9T///////////////////////////////////////////////////////////////////////////+q/1UAAP9MsSL/TLEi/0yxIv9Vqv//1IAr/0yxIv9MsSL/TLEi/wAAVf+qqlX/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/K4DU////////////////////qv9VAAD/TLEi/0yxIv9MsSL/AFWq//////////////////////+qVQD/TLEi/0yxIv9MsSL/ACuA/9T///////////////////////////////////////////////////////////////////////////+q/1UAAP9MsSL/TLEi/0yxIv9Vqqr/VQAA/0yxIv9MsSL/TLEi/wBVqv//qlX/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/K4DU////////////////////qv9VAAD/TLEi/0yxIv9MsSL/AFWq//////////////////////+qVQD/TLEi/0yxIv9MsSL/ACuA/9T///////////////////////////////////////////////////////////////////////////+q/1UAAP9MsSL/TLEi/0yxIv8rKyv/TLEi/0yxIv9MsSL/AAAr/4DU////qlX/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/K4DU////////////////////qv9VAAD/TLEi/0yxIv9MsSL/AFWq//////////////////////+qVQD/TLEi/0yxIv9MsSL/ACuA/9T///////////////////////////////////////////////////////////////////////////+q/1UAAP9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/ACuA/9T/////qlX/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/K4DU////////////////////qv9VAAD/TLEi/0yxIv9MsSL/AFWq//////////////////////+qVQD/TLEi/0yxIv9MsSL/ACuA/9T///////////////////////////////////////////////////////////////////////////+q/1UAAP9MsSL/TLEi/0yxIv9VgKr/VSsA/0yxIv9MsSL/Var/////////qlX/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/K4DU////////////////////qv9VAAD/TLEi/0yxIv9MsSL/AFWq//////////////////////+qVQD/TLEi/0yxIv9MsSL/ACuA/9T///////////////////////////////////////////////////////////////////////////+q/1UAAP9MsSL/TLEi/0yxIv9Vqv/////U/6pVK/8AK4D/1P//////////qlX/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/K4DU////////////////////qv9VAAD/TLEi/0yxIv9MsSL/AFWq//////////////////////+qVQD/TLEi/0yxIv9MsSL/ACuA/9T///////////////////////////////////////////////////////////////////////////+q/1UAAP9MsSL/TLEi/0yxIv9Vqv//////////////////////////////qlX/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/K4DU////////////////////qv9VAAD/TLEi/0yxIv9MsSL/AFWq//////////////////////+qVQD/TLEi/0yxIv9MsSL/ACuA/9T///////////////////////////////////////////////////////////////////////////+q/1UAAP9MsSL/TLEi/0yxIv9Vqv//////////////////////////////qlX/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/K4DU////////////////////qv9VAAD/TLEi/0yxIv9MsSL/AFWq//////////////////////+qVQD/TLEi/0yxIv9MsSL/ACuA/9T///////////////////////////////////////////////////////////////////////////+q/1UAAP9MsSL/TLEi/0yxIv9Vqv//////////////////////////////qlX/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/K4DU////////////////////qv9VAAD/TLEi/0yxIv9MsSL/AFWq//////////////////////+qVQD/TLEi/0yxIv9MsSL/ACuA/9T///////////////////////////////////////////////////////////////////////////+q/1UAAP9MsSL/TLEi/0yxIv9Vqv//////////////////////////////qlX/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/K4Cq/9TU1P/U1NT/1NTU/9TUqv9VAAD/TLEi/0yxIv9MsSL/AFWq/9TU1P/U1NT/1NTU/9TU1P+qVQD/TLEi/0yxIv9MsSL/ACuA/9T///////////////////////////////////////////////////////////////////////////+q/1UAAP9MsSL/TLEi/0yxIv8AACv/Kysr/ysrK/8rKyv/Kysr/ysrK/8rAAD/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/ACuA/9T///////////////////////////////////////////////////////////////////////////+q/1UAAP9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/ACuA/9T///////////////////////////////////////////////////////////////////////////+q/1UAAP9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/ACuA/9T///////////////////////////////////////////////////////////////////////////+q/1UAAP9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/AABV/6r/////////////////qv9VAAD/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/TLEi/0yxIv9MsSL/ACuA/9T///////////////////////////////////////////////////////////////////////////+q/1UrK/8rKyv/Kysr/ysrK/8rKyv/Kysr/ysrK/8rKyv/Kysr/ysrK/8rKyv/Kysr/ysrK/8rKyv/KytV/6r/////////////////1P/Uqqr/qqqq/6qqqv+qqqr/qqqq/6qqqv+qqqr/qqqq/6qqqv+qqqr/qqqq/6qqqv+qqqr/qqqq/6qqqv+qqqr/qqqq/6qqqv+qqqr/qqqq/6qqqv+qqqr/qqrU//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+ICON_PATH = PWD + "\\icon.ico"
 
 check_file_run = open(PWD + '\\my_keyboard_sound.lock', "a+")
 try:  
   portalocker.lock(check_file_run, portalocker.LOCK_EX | portalocker.LOCK_NB)
 except:
-  md = gtk.MessageDialog(None, 
-          gtk.DIALOG_DESTROY_WITH_PARENT, 
-          gtk.MESSAGE_QUESTION, 
-          gtk.BUTTONS_OK, "【肥鍵盤打字聲】已執行...")          
-  md.set_position(gtk.WIN_POS_CENTER)
-  response = md.run()            
-  if response == gtk.RESPONSE_OK or response == gtk.RESPONSE_DELETE_EVENT:
-    md.destroy()
-    sys.exit(0)
+  messagebox.showinfo(title='',message="【肥鍵盤打字聲】已執行...")    
+  sys.exit(0)
 
 # Preset play music
 is_play_music = True
@@ -127,129 +131,87 @@ def debug_print(data):
 if len(sys.argv) == 2:
   if sys.argv[1]=="-d":
     is_DEBUG_mode = True
+
+# From : https://github.com/Infinidat/infi.systray
+
     
-# 加入 trayicon
-def message(data=None):
-  "Function to display messages to the user."
-  msg=gtk.MessageDialog(None, gtk.DIALOG_MODAL,
-    gtk.MESSAGE_INFO, gtk.BUTTONS_OK, data)
-  msg.run()
-  msg.destroy()
 # From : https://github.com/gevasiliou/PythonTests/blob/master/TrayAllClicksMenu.py
-class TrayIcon(gtk.StatusIcon):
+
+class TrayIcon():
+    systray = ""
     def __init__(self):
       global VERSION
       global PWD
       global UCL_PIC_BASE64
-      gtk.StatusIcon.__init__(self)
+      global my
+      global ICON_PATH
       # base64.b64decode
       # From : https://sourceforge.net/p/matplotlib/mailman/message/20449481/
-      raw_data = base64.decodestring(UCL_PIC_BASE64)
-      #debug_print(gtk.gdk.Pixbuf)
-      w = 16
-      h = 16
-      img_pixbuf = gtk.gdk.pixbuf_new_from_data(
-              raw_data, gtk.gdk.COLORSPACE_RGB, True, 8, w, h, w*4)
-
-      self.set_from_pixbuf(img_pixbuf)
-      self.set_tooltip("肥鍵盤打字聲：%s" % (VERSION))
-      self.set_has_tooltip(True)
-      self.set_visible(True)
-      self.connect("button-press-event", self.on_click)
-
-    def m_about(self,data=None):  # if i ommit the data=none section python complains about too much arguments passed on greetme
-      message = gtk.MessageDialog(type=gtk.MESSAGE_INFO, buttons=gtk.BUTTONS_OK)
-      message.set_position(gtk.WIN_POS_CENTER_ALWAYS)
-      message.set_keep_above(True)
-      _msg_text = about_my_keyboard_sound()       
-      message.set_markup( _msg_text )      
-      message.show()      
-      response = message.run()            
-      if response == -5 or response == -4:
-        message.destroy()
-    def m_pm_switch(self,data=None):
+      raw_data = base64.decodestring(UCL_PIC_BASE64)      
+      #if my.is_file(ICON_PATH) == False:
+      my.file_put_contents(ICON_PATH,raw_data,False)
+      self.reload_tray()
+   
+    def reload_tray(self):
       global is_play_music
-      if is_play_music == False:
-        is_play_music = True
-      else:
-        is_play_music = False     
-    def m_quit(self,data=None):
-      self.set_visible(False)      
-      sys.exit()
-    def m_none(self,data=None):
-      return False
-    def m_change_volume(self,event,new_volume):
-      global NOW_VOLUME      
-      NOW_VOLUME = new_volume      
-      #然後播一下新的聲音大小
-      play_sound()
-                     
-    def on_click(self,data,event): #data1 and data2 received by the connect action line 23            
-      btn=event.button #Bby controlling this value (1-2-3 for left-middle-right) you can call other functions.                 
-      global menu
-      global menu_items
-      global NOW_VOLUME      
-      menu.set_visible(False)      
-      for i in range(0,len(menu_items)):
-        menu.remove(menu_items[i])
-      menu_items=[]
-      menu_items.append(gtk.MenuItem("1.關於肥鍵盤聲"))
-      menu.append( menu_items[len(menu_items)-1] )
-      menu_items[len(menu_items)-1].connect("activate", self.m_about) #added by gv - it had nothing before
-              
+      global ICON_PATH
+      global NOW_VOLUME            
+      menu_options = (
+          ("1.關於肥鍵盤打字聲", None, [self.m_about] ),
+          
+        )
       if is_play_music==True:
-        menu_items.append(gtk.MenuItem("2.【●】打字音"))
-        menu.append( menu_items[len(menu_items)-1] )
-        menu_items[len(menu_items)-1].connect("activate", self.m_pm_switch)
+        menu_options = menu_options + (("2.【●】打字音", None, [self.m_pm_switch]),)
       else:
-        menu_items.append(gtk.MenuItem("2.【　】打字音"))
-        menu.append( menu_items[len(menu_items)-1] )
-        menu_items[len(menu_items)-1].connect("activate", self.m_pm_switch)
+        menu_options = menu_options + (("2.【　】打字音", None, [self.m_pm_switch]),)
       
-      # For Volume choice
-      menu_items.append(gtk.MenuItem("3.打字音大小"))
-      menu.append( menu_items[len(menu_items)-1] )
-      menu_items[len(menu_items)-1].connect("activate", self.m_none)
-      
-      sub_menu = gtk.Menu()
-      sub_menu_items = []      
+      # 接下來作打字音
+      sound_level_list = ()
       for i in range(0,11):
+        #print("NOW_VOLUME: %s" % (NOW_VOLUME))
         v = i*10
         real_v = i*100        
         is_o = "　"
         if NOW_VOLUME == real_v:
           is_o = "●"
-        if v == 0:
-          sub_menu_items.append(gtk.MenuItem("【%s】靜音" % ( is_o )))
+        if i == 0:
+          sound_level_list = sound_level_list + (('【%s】靜音' % (is_o) , None, [self.m_change_volume,real_v] ),)
         else:
-          sub_menu_items.append(gtk.MenuItem("【%s】%d %%" % ( is_o,v )))
-        sub_menu.append( sub_menu_items[len(sub_menu_items)-1] )        
-        sub_menu_items[len(sub_menu_items)-1].connect("activate", self.m_change_volume,(real_v))
-      for i in range(0,5):
-        sub_menu_items.append(gtk.MenuItem(""))
-        sub_menu.append( sub_menu_items[len(sub_menu_items)-1] )
-        sub_menu_items[len(sub_menu_items)-1].connect("activate", self.m_none)
-      menu_items[len(menu_items)-1].set_submenu(sub_menu)
+          sound_level_list = sound_level_list + (("【%s】%s %%" % (is_o,v), None, [self.m_change_volume,real_v]),)
+                                                     
+      menu_options = menu_options + ((
+                ('3.打字音大小', None, sound_level_list),))
+        
+      menu_options = menu_options + (("離開(Quit)", None, [self.m_quit]),)
+      if self.systray=="":
+        self.systray = SysTrayIcon(ICON_PATH, "肥鍵盤打字聲 V%s" % (VERSION) , menu_options) #, on_quit=self.m_quit)
+        self.systray.start()
+      else:
+        #self.systray = SysTrayIcon(ICON_PATH, "肥鍵盤打字聲 V %s" % (VERSION) , menu_options)
+        self.systray.update(menu_options=menu_options)        
+    def m_about(self,event,data=None):  # if i ommit the data=none section python complains about too much arguments passed on greetme      
+      _msg_text = about_my_keyboard_sound()       
+      messagebox.showinfo(title="肥鍵盤打字機",message=_msg_text)  
+    def m_pm_switch(self,event,data=None):
+      global is_play_music
+      if is_play_music == False:
+        is_play_music = True
+      else:
+        is_play_music = False  
+      self.reload_tray()   
+    def m_quit(self,event,data=None):
       
-                        
-      menu_items.append(gtk.MenuItem(""))
-      menu.append( menu_items[len(menu_items)-1] )
-      
-      menu_items.append(gtk.MenuItem("離開(Quit)"))
-      menu.append( menu_items[len(menu_items)-1] )
-      menu_items[len(menu_items)-1].connect("activate", self.m_quit)
-
-      #add space
-      menu_items.append(gtk.MenuItem(""))
-      menu.append( menu_items[len(menu_items)-1] )
-      menu_items.append(gtk.MenuItem(""))
-      menu.append( menu_items[len(menu_items)-1] )
-      menu_items.append(gtk.MenuItem(""))
-      
-      
-      menu.show_all()      
-      menu.popup(None, None, None, btn, 2) #button can be hardcoded (i.e 1) but time must be correct.      
-
+      self.systray.shutdown()            
+      sys.exit()
+    def m_none(self,data=None):
+      return False
+    def m_change_volume(self,event,new_volume):
+      global NOW_VOLUME      
+      NOW_VOLUME = new_volume[0]      
+      #然後播一下新的聲音大小
+      play_sound()
+      self.reload_tray()               
+   
 
 def OnKeyboardEvent(event):    
   try:
@@ -266,22 +228,7 @@ hm.KeyAll = OnKeyboardEvent
 hm.HookKeyboard()
 # wait forever
 
-
-menu_items = []
-menu = gtk.Menu()
-
 tray = TrayIcon()  
 #win.show_all()
-updateGUI_Step = 0
-def updateGUI():
-  global updateGUI_Step
-  #global is_shutdown
-  while gtk.events_pending():
-    gtk.main_iteration(False)
-  updateGUI_Step = updateGUI_Step + 1
-  if updateGUI_Step % 100 == 0:
-    updateGUI_Step = 0    
-while True:
-  time.sleep(0.01)  
-  updateGUI()    
+    
 pythoncom.PumpMessages()
