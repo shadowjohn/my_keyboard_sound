@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-VERSION=0.01
+VERSION=0.02
 import portalocker
 import os
 import sys
@@ -24,10 +24,26 @@ sys.setdefaultencoding('UTF-8')
 UCL_PIC_BASE64 = "AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAAMIOAADCDgAAAAAAAAAAAAD////////////////////////////////////////////////////////////////////////////////////////////////+/v7//Pz8//v7+//7+/v//f39////////////////////////////////////////////////////////////1s7B/1pVU/9PT0//Tk5Q/56rtP/Cua7/bGlp/2pqa/9tbGz/ampp/25xd//R2eL//////////////////////8O1of8kIyn/fYCD/0A0Lf9vgZD/kIJv/yUrMv9WUEr/FBcd/19eXv8fHR//q7zL///////////////////////CtKH/MDE4/6qwt/9zZFf/boCP/49/bf9VZXf/v7Ok/y0zP//T09P/QDcw/6q7yv//////////////////////w7Wj/yEcGv8pKy//OTUy/3GCkf+Pf23/VWV3/7+zo/8sMz//09PS/0A3MP+qu8r//////////////////////8KzoP84O0H/b2to/y4pJf9wgpH/j4Bt/1BfcP+1qpv/KjA7/8fHx/89NC//qrvK///////////////////////Cs6D/O0FM/9HS0f9IOi//boGQ/5KCcP8UFhn/Ly0p/w0PEv80MzP/FRcc/62+zP//////////////////////wrOh/zI1Ov9hXFT/AwAB/3GDk/+QgW//NkBK/6iqrP+trKz/qqqq/62vs//l6u///////////////////////76vnf8aFhb/Mzs+/0M9OP9wgpD/j39t/1Fhc//7//////////////////////////////////////////////+vnYv/QUtX/9ff3/96alv/bX+P/49/bf9RYHL/+/7/////////////v7Ko/5ifqf/7/v//////////////////inhn/19vgf//////fGpa/21/jv+Of23/UWBy//v+/////////////4Z0Yv9KWmv/+f3/////////////+/bv/1pNQv+Kmaf/samg/z01L/93iZn/n5B+/ygrMf93eXr/fHx8/3p4dv8vKib/eIqc//////////////////37+P/Mycf/5+rt/9HMxv+zs7X/3uPo/+zo4/+4trT/srKy/7Kysv+ysrL/tba5/+Tp7v//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
 PWD = os.path.dirname(os.path.realpath(sys.argv[0]))
 
+check_file_run = open(PWD + '\\my_keyboard_sound.lock', "a+")
+try:  
+  portalocker.lock(check_file_run, portalocker.LOCK_EX | portalocker.LOCK_NB)
+except:
+  md = gtk.MessageDialog(None, 
+          gtk.DIALOG_DESTROY_WITH_PARENT, 
+          gtk.MESSAGE_QUESTION, 
+          gtk.BUTTONS_OK, "【肥鍵盤打字聲】已執行...")          
+  md.set_position(gtk.WIN_POS_CENTER)
+  response = md.run()            
+  if response == gtk.RESPONSE_OK or response == gtk.RESPONSE_DELETE_EVENT:
+    md.destroy()
+    sys.exit(0)
+
 # Preset play music
 is_play_music = True
 # Debug 模式
 is_DEBUG_mode = False
+
+NOW_VOLUME = 500 #預設音量
 
 wavs = my.glob(PWD + "\\*.wav")
 o_song = {}
@@ -43,6 +59,18 @@ for i in range(0,len(wavs)):
                         "wf":"",
                         "paudio_stream":""      
                       }
+def play_sound():
+  global is_play_music
+  global m_play_song
+  global max_thread___playMusic_counts
+  global step_thread___playMusic_counts
+  global NOW_VOLUME
+  global o_song
+  if len(o_song.keys())!=0 and step_thread___playMusic_counts < max_thread___playMusic_counts:
+    step_thread___playMusic_counts = step_thread___playMusic_counts + 1                  
+    m_play_song.extend( [ random.choice(o_song.keys()) ])
+    thread.start_new_thread( thread___playMusic,(NOW_VOLUME,))
+                            
 def thread___playMusic(keyboard_valume):
   try:
     # https://stackoverflow.com/questions/43679631/python-how-to-change-audio-volume
@@ -52,11 +80,10 @@ def thread___playMusic(keyboard_valume):
     global paudio_player
     global o_song
     global m_play_song
-    global step_thread___playMusic_counts
-    
+    global step_thread___playMusic_counts    
     #time.sleep(0.01)      
     if len(m_play_song) !=0 :
-      #print("TEST")
+      #debug_print("keyboard_valume: %s" % (keyboard_valume))
       # https://stackoverflow.com/questions/36664121/modify-volume-while-streaming-with-pyaudio
       chunk = 2048
       #s = random.choice(m_song)
@@ -64,9 +91,10 @@ def thread___playMusic(keyboard_valume):
       #print("TEST1")
       s = m_play_song.pop(0) #m_play_song[0]
       #print("TEST2")  
-      if len(o_song[s]["data"]) == 0:
-        #print("TEST3")
-        o_song[s]["wf"] = wf = wave.open(s, 'rb')
+      if len(o_song[s]["data"]) == 0 or o_song[s]["volume"] != keyboard_valume:        
+        o_song[s]["volume"] = keyboard_valume
+        o_song[s]["data"] = []
+        o_song[s]["wf"] = wave.open(s, 'rb')
         o_song[s]["paudio_stream"] = paudio_player.open(format = paudio_player.get_format_from_width(o_song[s]["wf"].getsampwidth()),
                       channels = o_song[s]["wf"].getnchannels(),
                       rate = o_song[s]["wf"].getframerate(),
@@ -149,11 +177,18 @@ class TrayIcon(gtk.StatusIcon):
       self.set_visible(False)      
       sys.exit()
     def m_none(self,data=None):
-      return False              
+      return False
+    def m_change_volume(self,event,new_volume):
+      global NOW_VOLUME      
+      NOW_VOLUME = new_volume      
+      #然後播一下新的聲音大小
+      play_sound()
+                     
     def on_click(self,data,event): #data1 and data2 received by the connect action line 23            
       btn=event.button #Bby controlling this value (1-2-3 for left-middle-right) you can call other functions.                 
       global menu
-      global menu_items      
+      global menu_items
+      global NOW_VOLUME      
       menu.set_visible(False)      
       for i in range(0,len(menu_items)):
         menu.remove(menu_items[i])
@@ -170,6 +205,32 @@ class TrayIcon(gtk.StatusIcon):
         menu_items.append(gtk.MenuItem("2.【　】打字音"))
         menu.append( menu_items[len(menu_items)-1] )
         menu_items[len(menu_items)-1].connect("activate", self.m_pm_switch)
+      
+      # For Volume choice
+      menu_items.append(gtk.MenuItem("3.打字音大小"))
+      menu.append( menu_items[len(menu_items)-1] )
+      menu_items[len(menu_items)-1].connect("activate", self.m_none)
+      
+      sub_menu = gtk.Menu()
+      sub_menu_items = []      
+      for i in range(0,11):
+        v = i*10
+        real_v = i*100        
+        is_o = "　"
+        if NOW_VOLUME == real_v:
+          is_o = "●"
+        if v == 0:
+          sub_menu_items.append(gtk.MenuItem("【%s】靜音" % ( is_o )))
+        else:
+          sub_menu_items.append(gtk.MenuItem("【%s】%d %%" % ( is_o,v )))
+        sub_menu.append( sub_menu_items[len(sub_menu_items)-1] )        
+        sub_menu_items[len(sub_menu_items)-1].connect("activate", self.m_change_volume,(real_v))
+      for i in range(0,5):
+        sub_menu_items.append(gtk.MenuItem(""))
+        sub_menu.append( sub_menu_items[len(sub_menu_items)-1] )
+        sub_menu_items[len(sub_menu_items)-1].connect("activate", self.m_none)
+      menu_items[len(menu_items)-1].set_submenu(sub_menu)
+      
                         
       menu_items.append(gtk.MenuItem(""))
       menu.append( menu_items[len(menu_items)-1] )
@@ -191,14 +252,9 @@ class TrayIcon(gtk.StatusIcon):
 
 
 def OnKeyboardEvent(event):    
-  global m_play_song
-  global max_thread___playMusic_counts
-  global step_thread___playMusic_counts
-  try:  
-    if is_play_music == True and event.MessageName == "key down" and len(o_song.keys())!=0 and step_thread___playMusic_counts < max_thread___playMusic_counts:
-      step_thread___playMusic_counts = step_thread___playMusic_counts + 1                  
-      m_play_song.extend( [ random.choice(o_song.keys()) ])
-      thread.start_new_thread( thread___playMusic,(50,))  
+  try:
+    if is_play_music == True and event.MessageName == "key down":  
+      play_sound()
   except:
     pass
   return True
