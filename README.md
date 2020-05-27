@@ -40,6 +40,7 @@
     <li>pyhook【放在p27目錄，點了安裝即可 p27/pyHook-1.5.1.win32-py2.7.exe】，偵測鍵盤按到的事件功能</li>
     <li>run.bat 方便快速執行</li>
     <li>build.bat 打包成單一執行檔</li>
+    <li>1.wav ~ 9.wav 打字聲音檔，每次打字會隨機挑一個播放，比較不會單調</li>
     <li>(Third party) php.py 羽山比較熟php，所以在python裡實作很多php的函式</li>
     <li>(Third party) portalocker.py 防重複執行，會Lock <s>c:\temp\UCLLIU.lock</s> 1.20 版改成跟 UCLLIU.exe 同目錄下的 UCLLIU.lock</li>
     <li>(Third party) traybar.py、win32_adapter.py System Tray 功能，有修改過</li>    
