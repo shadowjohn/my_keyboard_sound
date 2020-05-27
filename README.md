@@ -13,6 +13,11 @@
 <h3>開發動機：</h3>
 　　之前在FB看到朋友在談論要買機械鍵盤的事情，覺得好像可以作一個電腦軟體版的，閒閒就寫了。<br>
 <br>
+<h3>適用平台：</h3>
+<ul>
+  <li>（✓）Windows 10</li>
+</ul>
+<br>
 <h3>使用方法：</h3>
 <ul>
   <li>1.下載 dist 目錄下所有檔案 或 <a href="https://github.com/shadowjohn/my_keyboard_sound/blob/master/dist/my_keyboard_sound.zip">my_keyboard_sound.zip</a></li>
@@ -30,8 +35,7 @@
     <li>(Third party) php.py 羽山比較熟php，所以在python裡實作很多php的函式</li>
     <li>(Third party) portalocker.py 防重複執行，會鎖定 my_keyboard_sound.exe 同目錄下的 my_keyboard_sound.lock</li>    
     <li>(Third party) pyaudio 打字音</li>    
-</ul>
-<br>
+  </ul>
 <h3>檔案說明：</h3>
   <ul>
     <li>Python 27 (x86版本):【https://www.python.org/ftp/python/2.7.13/python-2.7.13.msi】</li>    
@@ -43,7 +47,6 @@
     <li>(Third party) portalocker.py 防重複執行，會Lock <s>c:\temp\UCLLIU.lock</s> 1.20 版改成跟 UCLLIU.exe 同目錄下的 UCLLIU.lock</li>
     <li>(Third party) traybar.py、win32_adapter.py System Tray 功能，有修改過</li>    
   </ul>
-<br>
 <h3>自行編譯：</h3>
   <ul>
     <li>1、請下載並安裝python 27 (x86版) 【https://www.python.org/ftp/python/2.7.13/python-2.7.13.msi】</li>
@@ -53,7 +56,6 @@
     <li>5、至windows cmd，下指令【pip install pyinstaller】</li>    
     <li>6、編成exe的方法，執行【build.bat】，即可將 my_keyboard_sound.exe 編到 dist 目錄下</li>    
   </ul>
-
 <h3>版本更新說明：</h3>
 <br>
     (2020-05-25) V0.01 版：
@@ -63,8 +65,11 @@
     增加可以調整音量大小
     
     (2020-05-27) V0.03 版：
-    移除 pygtk 套件依賴，改用 traybar    
-        
+    移除 pygtk 套件依賴，改用 traybar
+<h3>補充說明：</h3>
+  由於此程式使用 pyhook 開發，比較容易被防毒軟體誤判為 keylogger，有疑慮建議可以自行編譯使用<br>
+  有新版的話，固定會送 Windows Defender 資訊中心掃描進行排除，更新至最新的病毒碼應該都可以安心使用
+              
 <h3>Todo：</h3>
 <ul>
   <li><s>1、消除長壓的聲音</s> ( 有人建議留著，很療癒 )</li>
