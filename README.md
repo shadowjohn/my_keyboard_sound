@@ -15,9 +15,7 @@
 <br>
 <h3>使用方法：</h3>
 <ul>
-  <li>下載 dist 目錄下所有檔案 或
-    1.<a href="https://github.com/shadowjohn/my_keyboard_sound/blob/master/dist/my_keyboard_sound.zip">my_keyboard_sound.zip</a>
-  </li>
+  <li>1.下載 dist 目錄下所有檔案 或 <a href="https://github.com/shadowjohn/my_keyboard_sound/blob/master/dist/my_keyboard_sound.zip">my_keyboard_sound.zip</a></li>
   <li>2.解壓縮內容</li>
   <li>3.執行 my_keyboard_sound.exe</li>
   <li>4.右下會出現「肥」功能視窗</li>
