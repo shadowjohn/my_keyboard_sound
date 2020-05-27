@@ -9,6 +9,9 @@
 <br>
 <center>
   <img src="screenshot/my_keyboard_sound_2.png">
+  <br>
+  影片範例：https://youtu.be/Jz6ipkIPxxE 
+  
 </center>
 <h3>開發動機：</h3>
 　　之前在FB看到朋友在談論要買機械鍵盤的事情，覺得好像可以作一個電腦軟體版的，閒閒就寫了。<br>
