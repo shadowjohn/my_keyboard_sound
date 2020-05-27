@@ -8,7 +8,6 @@ import tkinter
 from tkinter import messagebox
 from traybar import SysTrayIcon
 import threading
-import uuid
 import pythoncom 
 import pyHook
 import thread
@@ -84,17 +83,13 @@ def thread___playMusic(keyboard_valume):
     global paudio_player
     global o_song
     global m_play_song
-    global step_thread___playMusic_counts    
-    #time.sleep(0.01)      
-    if len(m_play_song) !=0 :
-      #debug_print("keyboard_valume: %s" % (keyboard_valume))
+    global step_thread___playMusic_counts              
+    if len(m_play_song) !=0 :      
       # https://stackoverflow.com/questions/36664121/modify-volume-while-streaming-with-pyaudio
       chunk = 2048
       #s = random.choice(m_song)
       m_play_song = m_play_song[ : 2]
-      #print("TEST1")
-      s = m_play_song.pop(0) #m_play_song[0]
-      #print("TEST2")  
+      s = m_play_song.pop(0) #m_play_song[0]        
       if len(o_song[s]["data"]) == 0 or o_song[s]["volume"] != keyboard_valume:        
         o_song[s]["volume"] = keyboard_valume
         o_song[s]["data"] = []
@@ -105,12 +100,10 @@ def thread___playMusic(keyboard_valume):
                       output = True)
         # 寫聲音檔輸出來播放
         while True:
-          #print("TEST4")    
           d = o_song[s]["wf"].readframes(chunk)
           if d == "": break      
           # 這是調整音量大小的方法
-          o_song[s]["data"].extend([ audioop.mul(d, 2, keyboard_valume / 100.0 ) ])              
-      #print("TEST5")
+          o_song[s]["data"].extend([ audioop.mul(d, 2, keyboard_valume / 100.0 ) ])                    
       for i in range(0,len(o_song[s]["data"])):
         o_song[s]["paudio_stream"].write(o_song[s]["data"][i])
     if step_thread___playMusic_counts > 0:
@@ -167,8 +160,7 @@ class TrayIcon():
       
       # 接下來作打字音
       sound_level_list = ()
-      for i in range(0,11):
-        #print("NOW_VOLUME: %s" % (NOW_VOLUME))
+      for i in range(0,11):        
         v = i*10
         real_v = i*100        
         is_o = "　"
@@ -226,9 +218,7 @@ hm = pyHook.HookManager()
 hm.KeyAll = OnKeyboardEvent
 # set the hook
 hm.HookKeyboard()
-# wait forever
-
+# generator tray
 tray = TrayIcon()  
-#win.show_all()
-    
+# wait forever    
 pythoncom.PumpMessages()
