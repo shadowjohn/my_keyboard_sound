@@ -3,30 +3,75 @@
 讓平凡的鍵盤打起來有機械鍵盤的聲音
 <br>
 作者：羽山秋人 (https://3wa.tw)<br>
-版本：V0.03
-最初開發日期：2020-05-25 10:53
-最後更新時間：2020-05-27 01:42
-
-<h2>使用方法</h2>
-下載 dist 目錄下所有檔案 或
-  <a href="https://github.com/shadowjohn/my_keyboard_sound/blob/master/dist/my_keyboard_sound.zip">my_keyboard_sound.zip</a>
-<br>
-<br>
-解壓縮後執行 my_keyboard_sound.exe <br>
-
-在右下會出現「肥」功能視窗<br>
+版本：V0.03<br>
+最初開發日期：2020-05-25 10:53<br>
+最後更新時間：2020-05-27 01:42<br>
 <br>
 <center>
   <img src="screenshot/my_keyboard_sound_2.png">
 </center>
+<h3>開發動機：</h3>
+　　之前在FB看到朋友在談論要買機械鍵盤的事情，覺得好像可以作一個電腦軟體版的，閒閒就寫了。<br>
 <br>
-之後打字就會有機械鍵盤聲，叮叮噹噹很爽快~
-<br>
-<br>
-<h3>Todo:</h3>
+<h3>使用方法：</h3>
 <ul>
-  <li>1、消除長壓的聲音</li>
+  <li>下載 dist 目錄下所有檔案 或
+    1.<a href="https://github.com/shadowjohn/my_keyboard_sound/blob/master/dist/my_keyboard_sound.zip">my_keyboard_sound.zip</a>
+  </li>
+  <li>2.解壓縮內容</li>
+  <li>3.執行 my_keyboard_sound.exe</li>
+  <li>4.右下會出現「肥」功能視窗</li>
+  <li>5.從此享受打字有機械鍵盤聲，叮叮噹噹很爽快</li>
+</ul>
+<h3>開發工具：</h3>
+  <ul>
+    <li>Python 27 (32BIT)</li>
+    <li>pyhook 鍵盤事件勾</li>    
+    <li>pyinstaller 可搭配build.bat製作dist/my_keyboard_sound.exe檔</li>
+    <li>psutil 用來判斷目前視窗跑什麼，如果是putty、pietty、pcman出字方式要調整</li>
+    <li>(Third party) php.py 羽山比較熟php，所以在python裡實作很多php的函式</li>
+    <li>(Third party) portalocker.py 防重複執行，會鎖定 my_keyboard_sound.exe 同目錄下的 my_keyboard_sound.lock</li>    
+    <li>(Third party) pyaudio 打字音</li>    
+</ul>
+<br>
+<h3>檔案說明：</h3>
+  <ul>
+    <li>Python 27 (x86版本):【https://www.python.org/ftp/python/2.7.13/python-2.7.13.msi】</li>    
+    <li>pyhook【放在p27目錄，點了安裝即可 p27/pyHook-1.5.1.win32-py2.7.exe】，偵測鍵盤按到的事件功能</li>
+    <li>run.bat 方便快速執行</li>
+    <li>build.bat 打包成單一執行檔</li>
+    <li>(Third party) php.py 羽山比較熟php，所以在python裡實作很多php的函式</li>
+    <li>(Third party) portalocker.py 防重複執行，會Lock <s>c:\temp\UCLLIU.lock</s> 1.20 版改成跟 UCLLIU.exe 同目錄下的 UCLLIU.lock</li>
+    <li>(Third party) traybar.py、win32_adapter.py System Tray 功能，有修改過</li>    
+  </ul>
+<br>
+<h3>自行編譯：</h3>
+  <ul>
+    <li>1、請下載並安裝python 27 (x86版) 【https://www.python.org/ftp/python/2.7.13/python-2.7.13.msi】</li>
+    <li>2、請設定windows環境變數，在path裡加上 【;c:\Python27;c:\Python27\Scripts】</li>
+    <li>3、安裝【p27/pyHook-1.5.1.win32-py2.7.exe】</li>    
+    <li>4、至windows cmd，下指令【pip install pyaudio】</li>
+    <li>5、至windows cmd，下指令【pip install pyinstaller】</li>    
+    <li>6、編成exe的方法，執行【build.bat】，即可將 my_keyboard_sound.exe 編到 dist 目錄下</li>    
+  </ul>
+
+<h3>版本更新說明：</h3>
+<br>
+    (2020-05-25) V0.01 版：
+    初登場
+  
+    (2020-05-26) V0.02 版：
+    增加可以調整音量大小
+    
+    (2020-05-27) V0.03 版：
+    移除 pygtk 套件依賴，改用 traybar    
+        
+<h3>Todo：</h3>
+<ul>
+  <li><s>1、消除長壓的聲音</s> ( 有人建議留著，很療癒 )</li>
   <li>(Done 2020-05-26)2、聲音大小聲可調整</li>
   <li>3、不同機械鍵盤聲音檔可選</li>
   <li>4、backspace、enter、space 聲音可調</li>
   <li>(Done 2020-05-27)5、修正右下角選單被檔住的問題</li>
+  <li>6、滑鼠點擊也要有聲音的選項開關</li>
+</ul>
