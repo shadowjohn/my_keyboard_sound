@@ -47,8 +47,8 @@
     <li>build.bat 打包成單一執行檔</li>
     <li>1.wav ~ 9.wav 打字聲音檔，每次打字會隨機挑一個播放，比較不會單調</li>
     <li>(Third party) php.py 羽山比較熟php，所以在python裡實作很多php的函式</li>
-    <li>(Third party) portalocker.py 防重複執行，會Lock <s>c:\temp\UCLLIU.lock</s> 1.20 版改成跟 UCLLIU.exe 同目錄下的 UCLLIU.lock</li>
-    <li>(Third party) traybar.py、win32_adapter.py System Tray 功能，有修改過</li>    
+    <li>(Third party) portalocker.py 防重複執行，會鎖住與 my_keyboard_sound.exe 同目錄下的 my_keyboard_sound.lock</li>
+    <li>(Third party) traybar.py、win32_adapter.py System Tray 功能，使用我修改過的版本</li>    
   </ul>
 <h3>自行編譯：</h3>
   <ul>
