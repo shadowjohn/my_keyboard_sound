@@ -57,11 +57,22 @@ for i in range(0,len(wavs)):
   #from : https://pythonbasics.org/python-play-sound/
   #m_song.extend([ AudioSegment.from_wav(wavs[i]) ])
   o_song[ wavs[i] ] = {
+                        "lastKey": None,
+                        "mainname" : my.mainname(wavs[i]).lower(),
                         "filename":wavs[i],
                         "data":[],
                         "wf":"",
                         "paudio_stream":""      
                       }
+  if o_song[ wavs[i] ]["mainname"] == "enter" or o_song[ wavs[i] ]["mainname"] == "return":
+    o_song[ wavs[i] ]["lastKey"]=13;
+  elif o_song[ wavs[i] ]["mainname"] == "delete" or o_song[ wavs[i] ]["mainname"] == "del":
+    o_song[ wavs[i] ]["lastKey"]=46;
+  elif o_song[ wavs[i] ]["mainname"] == "backspace" or o_song[ wavs[i] ]["mainname"] == "bs":
+    o_song[ wavs[i] ]["lastKey"]=8;
+  elif o_song[ wavs[i] ]["mainname"] == "space" or o_song[ wavs[i] ]["mainname"] == "sp":
+    o_song[ wavs[i] ]["lastKey"]=32;
+#print(my.json_encode(o_song))
 def play_sound():
   global is_play_music
   global m_play_song
@@ -69,12 +80,17 @@ def play_sound():
   global step_thread___playMusic_counts
   global NOW_VOLUME
   global o_song
+  global PWD
+  
+  m_play_song.extend( [ random.choice(o_song.keys()) ])
   if len(o_song.keys())!=0 and step_thread___playMusic_counts < max_thread___playMusic_counts:
     step_thread___playMusic_counts = step_thread___playMusic_counts + 1                  
-    m_play_song.extend( [ random.choice(o_song.keys()) ])
+    
     thread.start_new_thread( thread___playMusic,(NOW_VOLUME,))
                             
 def thread___playMusic(keyboard_valume):
+  global lastKey
+  global PWD
   try:
     # https://stackoverflow.com/questions/43679631/python-how-to-change-audio-volume
     # 調整聲音大小
@@ -83,13 +99,39 @@ def thread___playMusic(keyboard_valume):
     global paudio_player
     global o_song
     global m_play_song
-    global step_thread___playMusic_counts              
+    global step_thread___playMusic_counts     
+    global lastKey                 
     if len(m_play_song) !=0 :      
       # https://stackoverflow.com/questions/36664121/modify-volume-while-streaming-with-pyaudio
       chunk = 2048
       #s = random.choice(m_song)
-      m_play_song = m_play_song[ : 2]
-      s = m_play_song.pop(0) #m_play_song[0]        
+      #print(my.json_encode(m_play_song))                    
+      #m_play_song = m_play_song[ : 2]
+      #s = m_play_song.pop(0) #m_play_song[0]   
+
+      #print("lastKey")
+      #print(lastKey)      
+      s = ""
+      if my.in_array(lastKey,[13,46,32,8]):
+        for key in o_song:
+          #print("Key")
+          #print(key)
+          #print(o_song[key]["lastKey"])
+          if o_song[key]["lastKey"]!=None and o_song[key]["lastKey"] == lastKey:
+            s = key
+            #print("s")
+            #print(s)  
+            break;     
+      else:
+        _arr = []
+        for key in o_song:
+          if o_song[key]["lastKey"]==None:
+            _arr.append(key)
+          pass
+        s = _arr[my.rand(0,len(_arr)-1)]
+        
+      #print(my.json_encode(s))      
+      #return     
       if len(o_song[s]["data"]) == 0 or o_song[s]["volume"] != keyboard_valume:        
         o_song[s]["volume"] = keyboard_valume
         o_song[s]["data"] = []
@@ -207,10 +249,10 @@ class TrayIcon():
    
 lastKey = None
 def OnKeyboardEvent(event):
-  global lastKey    
+  global lastKey
   try:
-    #print(dir(event));
-    if is_play_music == True and event.MessageName == "key down":
+    #print(event.KeyID);
+    if is_play_music == True and event.MessageName == "key down":      
       if lastKey != event.KeyID:
         lastKey = event.KeyID   
         play_sound()

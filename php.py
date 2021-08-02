@@ -28,3 +28,23 @@ class kit:
     def glob(self,pathdata):
         import glob
         return glob.glob(pathdata)
+    def basename(self,path):
+        import os
+        _output = "";
+        if self.is_file(path):
+          _output = os.path.basename(path)
+        else:
+          m = self.explode(self.SP(),path)
+          _output = m[self.count(m)-1]
+        return _output            
+    def mainname(self,path):
+        import os
+        return os.path.splitext(self.basename(path))[0]
+    def in_array(self, needle,arr):
+        return ( needle in arr )        
+    def json_encode(self,dict_data):
+        import json
+        return json.dumps(dict_data); #, ensure_ascii=False);
+    def rand(self,start_int,end_int):
+        import random
+        return random.randint(start_int,end_int)
