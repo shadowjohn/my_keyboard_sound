@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-VERSION=0.03
+VERSION=0.04
 import portalocker
 import os
 import sys
@@ -109,6 +109,7 @@ def thread___playMusic(keyboard_valume):
     if step_thread___playMusic_counts > 0:
       step_thread___playMusic_counts = step_thread___playMusic_counts -1         
   except Exception as e:
+    thread___playMusic(keyboard_valume)
     debug_print("thread___playMusic error:")
     debug_print(e)  
            
@@ -204,11 +205,17 @@ class TrayIcon():
       play_sound()
       self.reload_tray()               
    
-
-def OnKeyboardEvent(event):    
+lastKey = None
+def OnKeyboardEvent(event):
+  global lastKey    
   try:
-    if is_play_music == True and event.MessageName == "key down":  
-      play_sound()
+    #print(dir(event));
+    if is_play_music == True and event.MessageName == "key down":
+      if lastKey != event.KeyID:
+        lastKey = event.KeyID   
+        play_sound()
+    if is_play_music == True and event.MessageName == "key up":
+      lastKey = None
   except:
     pass
   return True
