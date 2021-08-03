@@ -3,9 +3,9 @@
 讓平凡的鍵盤打起來有機械鍵盤的聲音
 <br>
 作者：羽山秋人 (https://3wa.tw)<br>
-版本：V0.04<br>
+版本：V0.05<br>
 最初開發日期：2020-05-25 10:53<br>
-最後更新時間：2021-08-02 15:20<br>
+最後更新時間：2021-08-03 09:15<br>
 <br>
 <center>
   <img src="screenshot/my_keyboard_sound_2.png">
@@ -73,7 +73,14 @@
 
     (2021-08-02) V0.04 版：
     按住不會連續出聲，嘗試修正打太快當機的問題
-    自定檔如 backspace.wav、enter.wav、space.wav、delete.wav    
+    自定檔如 backspace.wav、enter.wav、space.wav、delete.wav
+    7、加入 ICQ 聲音
+    
+    (2021-08-03) V0.05 版：
+    8、預設音量改成 20%
+    9、移除 import pkg_resources
+    10、移除測試用 json
+        
 <h3>補充說明：</h3>
   由於此程式使用 pyhook 開發，比較容易被防毒軟體誤判為 keylogger，有疑慮建議可以自行編譯使用<br>
   有新版的話，固定會送 Windows Defender 資訊中心掃描進行排除，更新至最新的病毒碼應該都可以安心使用
@@ -86,5 +93,9 @@
   <li>(Done 2021-08-02)4、backspace、enter、space、delete 聲音可調</li>
   <li>(Done 2020-05-27)5、修正右下角選單被檔住的問題</li>
   <li>6、滑鼠點擊也要有聲音的選項開關</li>
+  <li>(Done 2021-08-02)7、加入 ICQ Enter、Delete、Backspace、Space 聲音 </li>
+  <li>(Done 2021-08-03)8、預設音量改成 20% </li>
+  <li>(Done 2021-08-03)9、移除 import pkg_resources </li>
+  <li>(Done 2021-08-03)10、移除 json </li>
   
 </ul>

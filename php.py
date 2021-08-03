@@ -42,9 +42,9 @@ class kit:
         return os.path.splitext(self.basename(path))[0]
     def in_array(self, needle,arr):
         return ( needle in arr )        
-    def json_encode(self,dict_data):
-        import json
-        return json.dumps(dict_data); #, ensure_ascii=False);
+    #def json_encode(self,dict_data):
+    #    import json
+    #    return json.dumps(dict_data); #, ensure_ascii=False);
     def rand(self,start_int,end_int):
         import random
         return random.randint(start_int,end_int)

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-VERSION=0.04
+VERSION=0.05
 import portalocker
 import os
 import sys
-import pkg_resources
+#import pkg_resources
 import tkinter
 from tkinter import messagebox
 from traybar import SysTrayIcon
@@ -46,7 +46,7 @@ is_play_music = True
 # Debug 模式
 is_DEBUG_mode = False
 
-NOW_VOLUME = 500 #預設音量
+NOW_VOLUME = 200 #預設音量
 
 wavs = my.glob(PWD + "\\*.wav")
 o_song = {}
