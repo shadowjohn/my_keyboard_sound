@@ -1,1 +1,1 @@
-python27 my_keyboard_sound.pyw -d &
+c:\python27\python.exe my_keyboard_sound.pyw -d &

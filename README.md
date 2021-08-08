@@ -3,9 +3,9 @@
 讓平凡的鍵盤打起來有機械鍵盤的聲音
 <br>
 作者：羽山秋人 (https://3wa.tw)<br>
-版本：V0.05<br>
+版本：V0.06<br>
 最初開發日期：2020-05-25 10:53<br>
-最後更新時間：2021-08-03 09:15<br>
+最後更新時間：2021-08-08 16:43<br>
 <br>
 <center>
   <img src="screenshot/my_keyboard_sound_2.png">
@@ -61,25 +61,28 @@
   </ul>
 <h3>版本更新說明：</h3>
 <br>
-
-    (2020-05-25) V0.01 版：
-    初登場
-  
-    (2020-05-26) V0.02 版：
-    增加可以調整音量大小
-    
-    (2020-05-27) V0.03 版：
-    移除 pygtk 套件依賴，改用 traybar
-
-    (2021-08-02) V0.04 版：
-    按住不會連續出聲，嘗試修正打太快當機的問題
-    自定檔如 backspace.wav、enter.wav、space.wav、delete.wav
-    7、加入 ICQ 聲音
+    (2021-08-08) V0.06 版：
+    11、修正 enter.wav、delete.wav、backspace.wav、space.wav 檔案不存在時，仍有打音
     
     (2021-08-03) V0.05 版：
     8、預設音量改成 20%
     9、移除 import pkg_resources
     10、移除測試用 json
+    
+    (2021-08-02) V0.04 版：
+    按住不會連續出聲，嘗試修正打太快當機的問題
+    自定檔如 backspace.wav、enter.wav、space.wav、delete.wav
+    7、加入 ICQ 聲音              
+    
+    (2020-05-27) V0.03 版：
+    移除 pygtk 套件依賴，改用 traybar
+
+    (2020-05-26) V0.02 版：
+    增加可以調整音量大小
+    
+    (2020-05-25) V0.01 版：
+    初登場
+    
         
 <h3>補充說明：</h3>
   由於此程式使用 pyhook 開發，比較容易被防毒軟體誤判為 keylogger，有疑慮建議可以自行編譯使用<br>
@@ -97,5 +100,5 @@
   <li>(Done 2021-08-03)8、預設音量改成 20% </li>
   <li>(Done 2021-08-03)9、移除 import pkg_resources </li>
   <li>(Done 2021-08-03)10、移除 json </li>
-  
+  <li>(Done 2021-08-08)11、修正 enter.wav、delete.wav、backspace.wav、space.wav 檔案不存在時，仍有打音</li>  
 </ul>

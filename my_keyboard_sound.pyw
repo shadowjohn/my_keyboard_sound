@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-VERSION=0.05
+VERSION=0.06
 import portalocker
 import os
 import sys
@@ -99,8 +99,7 @@ def thread___playMusic(keyboard_valume):
     global paudio_player
     global o_song
     global m_play_song
-    global step_thread___playMusic_counts     
-    global lastKey                 
+    global step_thread___playMusic_counts                         
     if len(m_play_song) !=0 :      
       # https://stackoverflow.com/questions/36664121/modify-volume-while-streaming-with-pyaudio
       chunk = 2048
@@ -122,7 +121,7 @@ def thread___playMusic(keyboard_valume):
             #print("s")
             #print(s)  
             break;     
-      else:
+      if s == "":
         _arr = []
         for key in o_song:
           if o_song[key]["lastKey"]==None:
